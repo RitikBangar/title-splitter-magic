@@ -2,10 +2,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { ScraperService } from "@/utils/ScraperService";
 import { useToast } from "@/hooks/use-toast";
-import { Link, Globe, Loader2 } from "lucide-react";
+import { Link, Globe, Loader2, CheckCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SellerValues } from "./calculator/SellerView";
 
@@ -17,6 +17,7 @@ interface PropertyLinkExtractorProps {
 export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLinkExtractorProps) {
   const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [lastExtracted, setLastExtracted] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleExtract = async () => {
@@ -31,8 +32,13 @@ export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLi
     }
 
     setIsLoading(true);
+    setLastExtracted(null);
+    
+    console.log("Starting extraction from URL:", url);
+    
     try {
       const result = await ScraperService.scrapePropertyData(url);
+      console.log("Extraction result:", result);
       
       if (result.success && result.data) {
         const extractedData: Partial<SellerValues> = {};
@@ -50,7 +56,9 @@ export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLi
           }
         }
         
+        console.log("Updating calculator with extracted data:", extractedData);
         onDataExtracted(extractedData);
+        setLastExtracted(new URL(url).hostname);
         
         toast({
           id: "extraction-success",
@@ -58,6 +66,7 @@ export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLi
           description: `Data extracted from ${new URL(url).hostname}`,
         });
       } else {
+        console.error("Extraction failed:", result.error);
         toast({
           id: "extraction-failed",
           title: "Extraction Failed",
@@ -66,6 +75,7 @@ export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLi
         });
       }
     } catch (error) {
+      console.error("Error during extraction:", error);
       toast({
         id: "extraction-error",
         title: "Error",
@@ -89,21 +99,21 @@ export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLi
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
-        <div className="flex items-center space-x-2">
-          <div className="relative flex-1">
+        <div className="flex flex-col md:flex-row items-center gap-2">
+          <div className="relative flex-1 w-full">
             <Link className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               type="url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://www.rightmove.co.uk/property-for-sale/..."
-              className="pl-9"
+              className="pl-9 w-full"
             />
           </div>
           <Button 
             onClick={handleExtract} 
             disabled={isLoading}
-            className="bg-violet-600 hover:bg-violet-700 text-white"
+            className="bg-violet-600 hover:bg-violet-700 text-white w-full md:w-auto"
           >
             {isLoading ? (
               <>
@@ -119,6 +129,15 @@ export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLi
           Supports property listings from Rightmove, Zoopla, OnTheMarket, and other popular platforms
         </p>
       </CardContent>
+      
+      {lastExtracted && (
+        <CardFooter className="bg-green-50 dark:bg-green-900/20 rounded-b-lg px-6 py-3">
+          <div className="flex items-center text-green-700 dark:text-green-400 text-sm">
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Successfully extracted data from {lastExtracted}
+          </div>
+        </CardFooter>
+      )}
     </Card>
   );
 }

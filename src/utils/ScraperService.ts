@@ -25,15 +25,18 @@ export class ScraperService {
     }
 
     try {
+      console.log('Attempting to scrape data from URL:', url);
+      
       // In a real implementation, this would call an API endpoint
       // For demo purposes, we'll simulate the extraction with a timeout
       return new Promise((resolve) => {
         setTimeout(() => {
           // Extract domain to simulate different responses based on site
-          const domain = new URL(url).hostname;
+          const domain = new URL(url).hostname.toLowerCase();
+          console.log('Detected domain:', domain);
           
-          // Simulate different data for different domains (for demo purposes)
-          if (domain.includes("rightmove") || domain.includes("zoopla")) {
+          // Simulate different data for different domains
+          if (domain.includes("rightmove")) {
             resolve({
               success: true,
               data: {
@@ -42,29 +45,41 @@ export class ScraperService {
                 address: "123 Property Street, London"
               }
             });
+          } else if (domain.includes("zoopla")) {
+            resolve({
+              success: true,
+              data: {
+                price: 725000,
+                numUnits: 8,
+                address: "456 Real Estate Road, Manchester"
+              }
+            });
           } else if (domain.includes("onthemarket")) {
+            console.log('Processing OnTheMarket URL, extracting data...');
             resolve({
               success: true,
               data: {
                 price: 750000,
                 numUnits: 9,
-                address: "456 Real Estate Avenue, Manchester"
+                address: "789 Investment Avenue, Birmingham"
               }
             });
           } else {
             // Generic response for other domains
+            console.log('Unknown property site, using generic data');
             resolve({
               success: true,
               data: {
                 price: 700000,
                 numUnits: 8,
-                address: "789 Investment Road, Birmingham"
+                address: "999 Default Property, Leeds"
               }
             });
           }
         }, 1500); // Simulate API delay
       });
     } catch (error) {
+      console.error('Error during property data extraction:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : "Failed to extract data"
