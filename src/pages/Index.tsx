@@ -4,6 +4,7 @@ import { SellerView, SellerValues } from "@/components/calculator/SellerView";
 import { BuyerView, BuyerValues } from "@/components/calculator/BuyerView";
 import { FinancingView } from "@/components/calculator/FinancingView";
 import { ResultsView } from "@/components/calculator/ResultsView";
+import { PropertyLinkExtractor } from "@/components/PropertyLinkExtractor";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Building, Calculator, PieChart, ArrowRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -26,6 +27,21 @@ const Index = () => {
     estimatedFlatValue: 75650,
     buyerOfferPrice: 605200
   });
+
+  const handleDataExtracted = (extractedData: Partial<SellerValues>) => {
+    // Update seller values with extracted data
+    setSellerValues(prev => {
+      const updated = { ...prev, ...extractedData };
+      
+      // If only purchasePrice or numFlats was updated, recalculate averagePricePerFlat
+      if ((extractedData.purchasePrice && !extractedData.averagePricePerFlat) || 
+          (extractedData.numFlats && !extractedData.averagePricePerFlat)) {
+        updated.averagePricePerFlat = Math.round(updated.purchasePrice / updated.numFlats);
+      }
+      
+      return updated;
+    });
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -54,6 +70,11 @@ const Index = () => {
             Calculate the potential profit and return on investment when purchasing a block of flats, 
             refurbishing them, and creating individual titles to maximize value.
           </p>
+        </div>
+
+        {/* Property Link Extractor */}
+        <div className="max-w-4xl mx-auto mb-8 animate-fadeIn">
+          <PropertyLinkExtractor onDataExtracted={handleDataExtracted} />
         </div>
 
         {isMobile ? (
