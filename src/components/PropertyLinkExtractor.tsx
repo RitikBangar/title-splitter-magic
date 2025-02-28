@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ScraperService } from "@/utils/ScraperService";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Link, Globe, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SellerValues } from "./calculator/SellerView";
@@ -22,6 +22,7 @@ export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLi
   const handleExtract = async () => {
     if (!url) {
       toast({
+        id: "empty-url-error",
         title: "Error",
         description: "Please enter a property listing URL",
         variant: "destructive",
@@ -52,11 +53,13 @@ export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLi
         onDataExtracted(extractedData);
         
         toast({
+          id: "extraction-success",
           title: "Success",
           description: `Data extracted from ${new URL(url).hostname}`,
         });
       } else {
         toast({
+          id: "extraction-failed",
           title: "Extraction Failed",
           description: result.error || "Could not extract property data",
           variant: "destructive",
@@ -64,6 +67,7 @@ export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLi
       }
     } catch (error) {
       toast({
+        id: "extraction-error",
         title: "Error",
         description: "Failed to process the URL",
         variant: "destructive",
