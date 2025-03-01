@@ -42,10 +42,10 @@ export function FinancingView({ sellerValues, buyerValues, className }: Financin
     setValues({ ...values, [field]: numValue });
   };
 
-  // Calculate financing details
-  const purchasePrice = buyerValues.buyerOfferPrice;
+  // Calculate financing details based on the seller's purchase price
+  const purchasePrice = sellerValues.purchasePrice; // Use seller's price instead of buyer's offer price
   const depositAmount = Math.round(purchasePrice * (values.depositPercentage / 100));
-  const ltvMortgage = purchasePrice - depositAmount; // Fix: Calculate the mortgage amount correctly
+  const ltvMortgage = purchasePrice - depositAmount;
   
   const mortgageInterestYearly = Math.round(ltvMortgage * (values.mortgageInterestRate / 100));
   const mortgageInterestMonthly = Math.round(mortgageInterestYearly / 12);
