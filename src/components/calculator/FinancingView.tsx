@@ -47,6 +47,7 @@ export function FinancingView({ sellerValues, buyerValues, className }: Financin
   const depositAmount = Math.round(purchasePrice * (values.depositPercentage / 100));
   const ltvMortgage = purchasePrice - depositAmount;
   
+  // Fix interest calculations to properly calculate annual interest amount
   const mortgageInterestYearly = Math.round(ltvMortgage * (values.mortgageInterestRate / 100));
   const mortgageInterestMonthly = Math.round(mortgageInterestYearly / 12);
   
