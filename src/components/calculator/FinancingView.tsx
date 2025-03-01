@@ -131,13 +131,15 @@ export function FinancingView({ sellerValues, buyerValues, className }: Financin
         <div className="pt-4 border-t mt-2">
           <div className="space-y-2">
             <Label htmlFor="rentPerFlatMonthly" className="font-medium">Rent per Flat (Monthly) (£)</Label>
-            <Input
-              id="rentPerFlatMonthly"
-              type="number"
-              value={values.rentPerFlatMonthly}
-              onChange={(e) => handleChange('rentPerFlatMonthly', e.target.value)}
-              className="text-right"
-            />
+            <div className="bg-sky-100 dark:bg-sky-900/40 p-1 rounded-md border border-sky-300 dark:border-sky-700">
+              <Input
+                id="rentPerFlatMonthly"
+                type="number"
+                value={values.rentPerFlatMonthly}
+                onChange={(e) => handleChange('rentPerFlatMonthly', e.target.value)}
+                className="text-right bg-transparent border-0 font-bold text-sky-800 dark:text-sky-300"
+              />
+            </div>
           </div>
           
           <div className="grid grid-cols-2 gap-4 mt-4">
@@ -150,11 +152,7 @@ export function FinancingView({ sellerValues, buyerValues, className }: Financin
             <div className="space-y-1">
               <div className="text-sm text-muted-foreground">Per Flat</div>
               <div className="text-md font-medium">£{rentPerFlatYearly.toLocaleString()}/year</div>
-              {/* Emphasized rent per flat with a special highlighted box */}
-              <div className="bg-sky-100 dark:bg-sky-900/40 p-2 rounded-md border border-sky-300 dark:border-sky-700 flex items-center">
-                <PoundSterling className="h-4 w-4 text-sky-600 dark:text-sky-400 mr-1" />
-                <span className="font-bold text-sky-800 dark:text-sky-300">{values.rentPerFlatMonthly.toLocaleString()}/month</span>
-              </div>
+              <div className="text-sm">£{values.rentPerFlatMonthly.toLocaleString()}/month</div>
             </div>
           </div>
         </div>
