@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { SellerValues } from "./SellerView";
 import { BuyerValues } from "./BuyerView";
 import { Separator } from "@/components/ui/separator";
-import { ArrowRight, TrendingUp, Home, Banknote } from "lucide-react";
+import { ArrowRight, TrendingUp, Home, Banknote, Calculator, ChevronsUp, LineChart, PiggyBank } from "lucide-react";
 
 interface ResultsViewProps {
   sellerValues: SellerValues;
@@ -44,17 +44,20 @@ export function ResultsView({ sellerValues, buyerValues, className }: ResultsVie
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* SECTION 1: COSTS & VALUATION */}
           <div className="space-y-6">
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold flex items-center">
-                <TrendingUp className="mr-2 h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                Value Post Title Splitting
-              </h3>
+            <div className="flex items-center space-x-2 mb-4">
+              <Calculator className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <h3 className="text-lg font-semibold text-emerald-800 dark:text-emerald-400">Costs & Valuation</h3>
+            </div>
+            
+            <div className="space-y-3 border border-emerald-100 dark:border-emerald-900/40 rounded-md p-4">
+              <h4 className="text-md font-medium">Initial Investment</h4>
               
               <div className="grid grid-cols-2 gap-2">
                 <div className="text-sm text-muted-foreground">Purchase Price:</div>
-                <div className="text-sm font-medium text-right">£{buyerValues.buyerOfferPrice.toLocaleString()}</div>
+                <div className="text-sm font-medium text-right">£{sellerValues.purchasePrice.toLocaleString()}</div>
                 
                 <div className="text-sm text-muted-foreground">Total Costs:</div>
                 <div className="text-sm font-medium text-right">£{totalCostsForBuyer.toLocaleString()}</div>
@@ -65,6 +68,7 @@ export function ResultsView({ sellerValues, buyerValues, className }: ResultsVie
               
               <Separator />
               
+              <h4 className="text-md font-medium">Post-Refurb Valuation</h4>
               <div className="grid grid-cols-2 gap-2">
                 <div className="text-sm text-muted-foreground">Each Flat Value After Refurb:</div>
                 <div className="text-sm font-medium text-right">£150,000</div>
@@ -83,38 +87,66 @@ export function ResultsView({ sellerValues, buyerValues, className }: ResultsVie
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold flex items-center">
-                <Banknote className="mr-2 h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                Buy & Sell Strategy
-              </h3>
+          {/* SECTION 2: BUY & SELL STRATEGY */}
+          <div className="space-y-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <Banknote className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              <h3 className="text-lg font-semibold text-amber-800 dark:text-amber-400">Buy & Sell Strategy</h3>
+            </div>
+            
+            <div className="space-y-3 border border-amber-100 dark:border-amber-900/40 rounded-md p-4">
+              <h4 className="text-md font-medium">Exit Strategy Analysis</h4>
               
-              <div className="grid grid-cols-3 gap-2 items-center">
-                <div className="text-sm text-muted-foreground">If Sold At:</div>
-                <div className="text-sm font-medium text-right">£{estimatedBlockValueAfterRefurb.toLocaleString()}</div>
-                <ArrowRight className="h-4 w-4 mx-auto text-muted-foreground" />
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <ChevronsUp className="h-4 w-4 text-amber-700 dark:text-amber-400" />
+                  <span className="text-sm font-medium">If Sold After Title Splitting</span>
+                </div>
                 
-                <div className="text-sm text-muted-foreground">Less Total Outlay:</div>
-                <div className="text-sm font-medium text-right">£{totalSpend.toLocaleString()}</div>
-                <ArrowRight className="h-4 w-4 mx-auto text-muted-foreground" />
+                <div className="grid grid-cols-3 gap-2 items-center">
+                  <div className="text-sm text-muted-foreground">Post-Refurb Value:</div>
+                  <div className="text-sm font-medium text-right">£{estimatedBlockValueAfterRefurb.toLocaleString()}</div>
+                  <ArrowRight className="h-4 w-4 mx-auto text-muted-foreground" />
+                  
+                  <div className="text-sm text-muted-foreground">Less Total Outlay:</div>
+                  <div className="text-sm font-medium text-right">£{totalSpend.toLocaleString()}</div>
+                  <ArrowRight className="h-4 w-4 mx-auto text-muted-foreground" />
+                </div>
+                
+                <div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-md">
+                  <div className="text-sm text-amber-800 dark:text-amber-400 font-medium">Profit on Sale:</div>
+                  <div className="text-lg font-bold text-amber-700 dark:text-amber-300">
+                    £{profitOnSale.toLocaleString()}
+                  </div>
+                </div>
               </div>
               
-              <div className="p-3 bg-amber-100 dark:bg-amber-900/30 rounded-md">
-                <div className="text-sm text-amber-800 dark:text-amber-400 font-medium">Profit on Sale:</div>
-                <div className="text-lg font-bold text-amber-700 dark:text-amber-300">
-                  £{profitOnSale.toLocaleString()}
+              <div className="mt-3 pt-3 border-t border-amber-200 dark:border-amber-900/40">
+                <div className="flex items-center space-x-2">
+                  <LineChart className="h-4 w-4 text-amber-700 dark:text-amber-400" />
+                  <span className="text-sm font-medium">Return on Investment</span>
+                </div>
+                <div className="mt-2 text-sm">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="text-muted-foreground">ROI Percentage:</div>
+                    <div className="font-medium text-right">{((profitOnSale / totalSpend) * 100).toFixed(1)}%</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
+          {/* SECTION 3: REFINANCE STRATEGY */}
           <div className="space-y-6">
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold flex items-center">
-                <Home className="mr-2 h-5 w-5 text-sky-600 dark:text-sky-400" />
-                Refinance Strategy
-              </h3>
+            <div className="flex items-center space-x-2 mb-4">
+              <Home className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+              <h3 className="text-lg font-semibold text-sky-800 dark:text-sky-400">Refinance Strategy</h3>
+            </div>
+            
+            <div className="space-y-3 border border-sky-100 dark:border-sky-900/40 rounded-md p-4">
+              <h4 className="text-md font-medium">Mortgage Options</h4>
               
               <div className="grid grid-cols-2 gap-2">
                 <div className="text-sm text-muted-foreground">Refinanced Value:</div>
@@ -130,7 +162,10 @@ export function ResultsView({ sellerValues, buyerValues, className }: ResultsVie
               <Separator />
               
               <div className="grid grid-cols-2 gap-2">
-                <div className="text-sm text-muted-foreground">Total Spent:</div>
+                <div className="text-sm text-muted-foreground">Purchase Price:</div>
+                <div className="text-sm font-medium text-right">£{buyerValues.buyerOfferPrice.toLocaleString()}</div>
+                
+                <div className="text-sm text-muted-foreground">Total Investment:</div>
                 <div className="text-sm font-medium text-right">£{totalSpend.toLocaleString()}</div>
               </div>
               
@@ -143,6 +178,19 @@ export function ResultsView({ sellerValues, buyerValues, className }: ResultsVie
                   {cashReleased > 0 
                     ? "You are taking capital out and potentially more" 
                     : "You need to leave some money in the deal"}
+                </div>
+              </div>
+              
+              <div className="mt-3 pt-3 border-t border-sky-200 dark:border-sky-900/40">
+                <div className="flex items-center space-x-2">
+                  <PiggyBank className="h-4 w-4 text-sky-700 dark:text-sky-400" />
+                  <span className="text-sm font-medium">Money Left In Deal</span>
+                </div>
+                <div className="mt-2 text-sm">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="text-muted-foreground">Capital Remaining:</div>
+                    <div className="font-medium text-right">£{Math.max(0, totalSpend - refinancedMortgage).toLocaleString()}</div>
+                  </div>
                 </div>
               </div>
             </div>

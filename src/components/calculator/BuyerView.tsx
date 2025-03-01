@@ -49,6 +49,9 @@ export function BuyerView({ sellerValues, onValuesChange, className }: BuyerView
   const totalCosts = totalRefurbCost + totalLegalCostToBuy + 
     totalLegalCostForTitleSplitting + totalLegalCostForRefinancing + values.stampDutyLandTax;
 
+  // Calculate buyer offer price (purchase price - total costs)
+  const calculatedBuyerOfferPrice = Math.max(0, sellerValues.purchasePrice - totalCosts);
+
   const handleChange = (field: keyof BuyerValues, value: string) => {
     const numValue = value === "" ? 0 : parseFloat(value);
     const newValues = { ...values, [field]: numValue };
@@ -56,11 +59,10 @@ export function BuyerView({ sellerValues, onValuesChange, className }: BuyerView
     onValuesChange(newValues);
   };
 
-  // Update buyer offer price when seller price changes
+  // Update values whenever seller price or costs change
   useEffect(() => {
-    const differencePercent = 0.865; // 86.5% of seller price based on spreadsheet
-    const newOfferPrice = Math.round(sellerValues.purchasePrice * differencePercent);
     setValues(prev => {
+      const newOfferPrice = Math.max(0, sellerValues.purchasePrice - totalCosts);
       const updated = { 
         ...prev, 
         buyerOfferPrice: newOfferPrice,
@@ -69,7 +71,7 @@ export function BuyerView({ sellerValues, onValuesChange, className }: BuyerView
       onValuesChange(updated);
       return updated;
     });
-  }, [sellerValues.purchasePrice, sellerValues.numFlats]);
+  }, [sellerValues.purchasePrice, sellerValues.numFlats, totalCosts]);
   
   // Initial effect to notify parent about default values
   useEffect(() => {
@@ -173,8 +175,9 @@ export function BuyerView({ sellerValues, onValuesChange, className }: BuyerView
             onChange={(e) => handleChange('buyerOfferPrice', e.target.value)}
             className="text-right bg-white dark:bg-background"
           />
-          <div className="text-sm text-right text-amber-700 dark:text-amber-400 font-medium">
-            Difference from Seller Price: £{(sellerValues.purchasePrice - values.buyerOfferPrice).toLocaleString()}
+          <div className="flex justify-between text-sm text-amber-700 dark:text-amber-400">
+            <span className="font-medium">Seller Price: £{sellerValues.purchasePrice.toLocaleString()}</span>
+            <span className="font-medium">Difference: £{(sellerValues.purchasePrice - values.buyerOfferPrice).toLocaleString()}</span>
           </div>
         </div>
       </CardContent>

@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Slider } from "@/components/ui/slider";
 import { BuyerValues } from "./BuyerView";
 import { SellerValues } from "./SellerView";
+import { Bold, PoundSterling } from "lucide-react";
 
 interface FinancingViewProps {
   sellerValues: SellerValues;
@@ -44,7 +45,7 @@ export function FinancingView({ sellerValues, buyerValues, className }: Financin
   // Calculate financing details
   const purchasePrice = buyerValues.buyerOfferPrice;
   const depositAmount = Math.round(purchasePrice * (values.depositPercentage / 100));
-  const ltvMortgage = Math.round(purchasePrice * (1 - values.depositPercentage / 100));
+  const ltvMortgage = purchasePrice - depositAmount; // Fix: Calculate the mortgage amount correctly
   
   const mortgageInterestYearly = Math.round(ltvMortgage * (values.mortgageInterestRate / 100));
   const mortgageInterestMonthly = Math.round(mortgageInterestYearly / 12);
@@ -82,8 +83,8 @@ export function FinancingView({ sellerValues, buyerValues, className }: Financin
             onValueChange={(value) => handleChange('depositPercentage', value)}
           />
           <div className="flex justify-between text-sm text-muted-foreground mt-1">
-            <span>£{depositAmount.toLocaleString()}</span>
-            <span>£{ltvMortgage.toLocaleString()}</span>
+            <span>£{depositAmount.toLocaleString()} (Deposit)</span>
+            <span>£{ltvMortgage.toLocaleString()} (Mortgage)</span>
           </div>
         </div>
         
@@ -149,7 +150,11 @@ export function FinancingView({ sellerValues, buyerValues, className }: Financin
             <div className="space-y-1">
               <div className="text-sm text-muted-foreground">Per Flat</div>
               <div className="text-md font-medium">£{rentPerFlatYearly.toLocaleString()}/year</div>
-              <div className="text-sm">£{values.rentPerFlatMonthly.toLocaleString()}/month</div>
+              {/* Emphasized rent per flat with a special highlighted box */}
+              <div className="bg-sky-100 dark:bg-sky-900/40 p-2 rounded-md border border-sky-300 dark:border-sky-700 flex items-center">
+                <PoundSterling className="h-4 w-4 text-sky-600 dark:text-sky-400 mr-1" />
+                <span className="font-bold text-sky-800 dark:text-sky-300">{values.rentPerFlatMonthly.toLocaleString()}/month</span>
+              </div>
             </div>
           </div>
         </div>
