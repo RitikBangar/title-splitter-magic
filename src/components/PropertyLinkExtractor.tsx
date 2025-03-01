@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { ScraperService } from "@/utils/ScraperService";
 import { useToast } from "@/hooks/use-toast";
-import { Link, Globe, Loader2, CheckCircle } from "lucide-react";
+import { Link, Globe, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SellerValues } from "./calculator/SellerView";
 
@@ -18,10 +18,15 @@ export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLi
   const [url, setUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [lastExtracted, setLastExtracted] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleExtract = async () => {
-    if (!url) {
+    // Reset states
+    setError(null);
+    
+    if (!url.trim()) {
+      setError("Please enter a property listing URL");
       toast({
         id: "empty-url-error",
         title: "Error",
@@ -37,6 +42,21 @@ export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLi
     console.log("Starting extraction from URL:", url);
     
     try {
+      // Try to validate URL format client-side first
+      try {
+        new URL(url); // Will throw if invalid
+      } catch (e) {
+        setError("Invalid URL format. Make sure it starts with http:// or https://");
+        setIsLoading(false);
+        toast({
+          id: "invalid-url-format",
+          title: "Invalid URL",
+          description: "Please enter a valid URL starting with http:// or https://",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       const result = await ScraperService.scrapePropertyData(url);
       console.log("Extraction result:", result);
       
@@ -67,6 +87,7 @@ export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLi
         });
       } else {
         console.error("Extraction failed:", result.error);
+        setError(result.error || "Could not extract property data");
         toast({
           id: "extraction-failed",
           title: "Extraction Failed",
@@ -75,11 +96,13 @@ export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLi
         });
       }
     } catch (error) {
-      console.error("Error during extraction:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to process the URL";
+      console.error("Error during extraction:", errorMessage);
+      setError(errorMessage);
       toast({
         id: "extraction-error",
         title: "Error",
-        description: "Failed to process the URL",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -107,7 +130,7 @@ export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLi
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://www.rightmove.co.uk/property-for-sale/..."
-              className="pl-9 w-full"
+              className={cn("pl-9 w-full", error ? "border-red-300 focus-visible:ring-red-300" : "")}
             />
           </div>
           <Button 
@@ -125,9 +148,17 @@ export function PropertyLinkExtractor({ onDataExtracted, className }: PropertyLi
             )}
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2">
-          Supports property listings from Rightmove, Zoopla, OnTheMarket, and other popular platforms
-        </p>
+        
+        {error ? (
+          <div className="mt-2 text-xs text-red-500 flex items-center gap-1">
+            <AlertCircle className="h-3 w-3" />
+            {error}
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground mt-2">
+            Supports property listings from Rightmove, Zoopla, OnTheMarket, and other popular platforms
+          </p>
+        )}
       </CardContent>
       
       {lastExtracted && (
